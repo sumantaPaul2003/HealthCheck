@@ -1,5 +1,5 @@
 # HealthCheck (MCA major project)
-🩺 HealthCheck is an AI-powered health prediction and wellness web app that helps users assess their risk for diseases like heart disease, diabetes, kidney disease, liver disease, breast cancer, and Parkinson’s, along with mental health screening for depression, anxiety, and stress.
+🩺 HealthCheck is an ML-based health prediction and wellness web app that helps users assess their risk for diseases like heart disease, diabetes, kidney disease, liver disease, breast cancer, and Parkinson’s, along with mental health screening for depression, anxiety, and stress.
 
 It also features a nutrition and wellness section where users can calculate their BMI, BMR, daily water intake, and nutritional needs based on individual parameters.
 
