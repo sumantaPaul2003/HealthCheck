@@ -88,7 +88,7 @@ tumor_model = load_model("model.h5")
 tumor_class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
 
 with open("disease_predictor.pkl", "rb") as f:
-    model = pickle.load(f)
+    modelS = pickle.load(f)
 
 with open("symptom_list.pkl", "rb") as f:
     symptom_list = pickle.load(f)
@@ -201,16 +201,18 @@ def login():
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
-        print(user)
         cur.close()
 
+        if user is None:
+            flash("Invalid email or password. Please try again.", "danger")
+            return redirect('/login')
+        
         if user[8] == 'blocked':  
                 flash("Your account is blocked. Please contact admin.", "danger")
                 return redirect('/login')
         
         if user and check_password_hash(user[5], password):  # user[5] is the password column
-        #if user and check_password_hash(user['password'], password):
-
+        
             session['logged_in'] = True
             #session['email'] = user[2]
             session['id'] = user[0]
@@ -224,7 +226,7 @@ def login():
 
             if remember:
                 session.permanent = True
-                app.permanent_session_lifetime = timedelta(days=30)
+                #app.permanent_session_lifetime = timedelta(days=30)
             else:
                 session.permanent = False
 
@@ -252,8 +254,8 @@ def forgot_password():
         email = request.form['email'].strip()
 
         # Validate email format
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            flash("Invalid email format", "danger")
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@gmail\.com$", email):
+            flash("Email must be a valid Gmail address", "danger")
             return redirect(url_for('forgot_password'))
 
         # Check if email exists in DB
@@ -265,8 +267,8 @@ def forgot_password():
         if user:
             # Generate token
             token = serializer.dumps(email, salt='password-reset-salt')
-            #reset_url = url_for('reset_password_token', token=token, _external=True)
-            reset_url = request.host_url.rstrip('/') + url_for('reset_password_token', token=token)
+            reset_url = url_for('reset_password_token', token=token, _external=True)
+            
 
 
             # Send email
@@ -328,9 +330,8 @@ def predict_disease():
 
     # Create a binary vector of symptoms
     input_vector = [1 if symptom in selected_symptoms else 0 for symptom in symptom_list]
-
     # Predict probabilities
-    probabilities = model.predict_proba([input_vector])[0]
+    probabilities = modelS.predict_proba([input_vector])[0]
     top_indices = sorted(range(len(probabilities)), key=lambda i: probabilities[i], reverse=True)[:3]
 
     results = []
